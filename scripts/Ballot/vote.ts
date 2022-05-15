@@ -36,7 +36,7 @@ async function main() {
   ) as Ballot;
   const proposals = await ballotContract.proposals(proposalIndex);
   console.log(`proposal: ${ethers.utils.parseBytes32String(proposals.name)}`);
-  const tx = await ballotContract.vote(proposals.name);
+  const tx = await ballotContract.vote(proposalIndex);
   console.log('awaiting confirmation');
   await tx.wait();
   console.log(`Transaction completed. Hash: ${tx.hash}`);
