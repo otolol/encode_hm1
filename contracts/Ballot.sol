@@ -17,7 +17,6 @@ contract Ballot {
     struct Proposal {
         bytes32 name; // short name (up to 32 bytes)
         uint256 voteCount; // number of accumulated votes
-        bool tested;
     }
 
     address public chairperson;
@@ -41,7 +40,7 @@ contract Ballot {
             // `Proposal({...})` creates a temporary
             // Proposal object and `proposals.push(...)`
             // appends it to the end of `proposals`.
-            proposals.push(Proposal({name: proposalNames[i], voteCount: 0, tested: false}));
+            proposals.push(Proposal({name: proposalNames[i], voteCount: 0}));
         }
     }
 
@@ -135,6 +134,10 @@ contract Ballot {
                 winningProposal_ = p;
             }
         }
+    }
+
+    function getProposals() public view returns(Proposal[] memory propsoals_) {
+        return proposals;
     }
 
     // Calls winningProposal() function to get the index

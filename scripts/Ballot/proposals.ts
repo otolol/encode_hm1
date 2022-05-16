@@ -3,7 +3,13 @@ import * as ballotJson from "../../artifacts/contracts/Ballot.sol/Ballot.json";
 import { Ballot } from "../../typechain";
 import { EXPOSED_KEY } from "./key";
 
-
+function convertStringArrayFromBytes32(array: any[]) {
+    const stringArrray = [];
+    for (let index = 0; index < array.length; index++) {
+      stringArrray.push(ethers.utils.parseBytes32String(array[index].name));
+    }
+    return stringArrray;
+}
 async function main() {
   const wallet =
     process.env.MNEMONIC && process.env.MNEMONIC.length > 0
@@ -27,9 +33,9 @@ async function main() {
       ballotJson.abi,
       signer
   ) as Ballot;
-    const winning = await ballotContract.winnerName();
-    const converted = ethers.utils.parseBytes32String(winning);
-    console.log(`winner: ${converted}`);
+    const arr = [];
+    const proposals = await ballotContract.getProposals();
+    console.log(`proposals: ${convertStringArrayFromBytes32(proposals)}`);
 }
 
 main().catch((error) => {
