@@ -88,7 +88,20 @@ describe("Ballot", function () {
         giveRightToVote(ballotContract, voterAddress)
       ).to.be.revertedWith("");
     });
+
+    it("triggers the NewVoter event with the adress of the new voter", async () => {
+      const voterAdress = accounts[1].address;
+      await expect( ballotContract.giveRightToVote(voterAdress)).to.emit(ballotContract, "NewVoter");
+    });
+
   });
+
+  describe("when voter has voter power", async () => {
+    this.beforeEach(async () => {
+      const voterAddress = accounts[1].address;
+      await giveRightToVote(ballotContract, voterAddress)
+    })
+  })
 
   describe("when the voter interact with the vote function in the contract", function () {
     it("should revert if the voter has not been given right to vote", async function () {
@@ -121,6 +134,12 @@ describe("Ballot", function () {
       const voterData = await ballotContract.voters(accounts[1].address);
       expect(voterData.vote).to.eq(1);
     });
+
+    it("should triggers voted events", async () => {
+      await expect(ballotContract.connect(accounts[1]).vote(1))
+      .to.emit(ballotContract, "Voted")
+      .withArgs(accounts[1].address, 1, 1)
+    })
 
     it("should increment the proposal's vote count with the sender weight", async function () {
       const voter = accounts[1];

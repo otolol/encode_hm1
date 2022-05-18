@@ -3,6 +3,17 @@ pragma solidity >=0.7.0 <0.9.0;
 
 /// @title Voting with delegation.
 contract Ballot {
+
+    event NewVoter(address indexed voter);
+    event Voted(address indexed voter, uint256 indexed proposal, uint256 weight);
+    event Delegated(
+        address indexed voter,
+        address indexed finalDelegate,
+        uint256 finalWeight,
+        bool voted,
+        uint256 proposal,
+        uint256 proposalVotes
+    );
     // This declares a new complex type which will
     // be used for variables later.
     // It will represent a single voter.
@@ -64,6 +75,7 @@ contract Ballot {
         require(!voters[voter].voted, "The voter already voted.");
         require(voters[voter].weight == 0);
         voters[voter].weight = 1;
+        emit NewVoter(voter);
     }
 
     /// Delegate your vote to the voter `to`.
@@ -101,10 +113,12 @@ contract Ballot {
             // If the delegate already voted,
             // directly add to the number of votes
             proposals[delegate_.vote].voteCount += sender.weight;
+            emit Delegated(msg.sender, to, 0, true, delegate_.vote, proposals[delegate_.vote].voteCount);
         } else {
             // If the delegate did not vote yet,
             // add to her weight.
             delegate_.weight += sender.weight;
+            emit Delegated(msg.sender, to, delegate_.vote, false, 0, 0);
         }
     }
 
@@ -122,6 +136,7 @@ contract Ballot {
         // this will throw automatically and revert all
         // changes.
         proposals[proposal].voteCount += sender.weight;
+        emit Voted(msg.sender, proposal, sender.weight);
     }
 
     /// @dev Computes the winning proposal taking all
